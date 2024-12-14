@@ -102,7 +102,7 @@ if (!('language' in args)) {
 	)
 	process.exit(1)
 }
-const language = args['language'] || process.env.OPENAI_API_KEY
+const language = args['language']
 
 const model = args['model'] || 'gpt-4o-mini'
 
