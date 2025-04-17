@@ -202,7 +202,7 @@ for (const asset of assets) {
 		continue
 	}
 
-	if (asset.meta_data.alt.length > 0 && !args.overwrite) {
+	if (typeof asset.alt === 'string' && asset.alt.length > 0 && !args.overwrite) {
 		verboseLog(
 			`  Alt-text already exists ("${asset.alt}") and --overwrite parameter is not set. Skipping.`
 		)
