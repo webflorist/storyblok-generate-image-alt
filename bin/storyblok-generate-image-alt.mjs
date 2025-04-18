@@ -193,12 +193,13 @@ const assets = await StoryblokMAPI.getAll(`spaces/${spaceId}/assets`)
 // Process assets
 console.log('')
 console.log(`Processing assets...`)
+const allowedContentTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 for (const asset of assets) {
 	verboseLog('')
 	verboseLog(`- Asset "${asset.filename}" (ID "${asset.id}"):`)
 
-	if (!asset.content_type.includes('image/')) {
-		verboseLog('  Not an image. Skipping.')
+	if (!allowedContentTypes.includes(asset.content_type)) {
+		verboseLog('  Only png, jpeg, gif and webp image formats are supported. Skipping.')
 		continue
 	}
 

@@ -5,6 +5,8 @@
 
 An npx CLI tool to automatically generate alt-texts of images of a [Storyblok CMS](https://www.storyblok.com) space using the OpenAI API.
 
+Due to a limitation by OpenAI, only png, jpeg, gif and webp images are supported.
+
 ## Requirements
 
 - A **Storyblok** space.
