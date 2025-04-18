@@ -5,6 +5,7 @@ import StoryblokClient from 'storyblok-js-client'
 import { performance } from 'perf_hooks'
 import dotenvx from '@dotenvx/dotenvx'
 import OpenAI from 'openai'
+import { setTimeout } from 'timers/promises'
 
 const startTime = performance.now()
 
@@ -124,13 +125,8 @@ const openai = new OpenAI({
 // Setup cache
 const cache = {}
 
-// Default generation function
-let totalUsedTokens = 0
-const generateAltText = async (url) => {
-	if (url in cache) {
-		return cache[url]
-	}
-
+// Function to create alt-text via OpenAI API
+async function createAltText(url) {
 	const response = await openai.chat.completions.create({
 		model: model,
 		messages: [
@@ -161,6 +157,33 @@ const generateAltText = async (url) => {
 		],
 		max_completion_tokens: maxTokens,
 	})
+	return response
+}
+
+// Default generation function
+let totalUsedTokens = 0
+const generateAltText = async (url) => {
+	if (url in cache) {
+		return cache[url]
+	}
+
+	let response = null
+
+	while (response === null) {
+		try {
+			response = await createAltText(url)
+		} catch (error) {
+			if (error.code === 'rate_limit_exceeded') {
+				const retryAfter = Number.parseInt(error.headers['retry-after-ms'])
+				verboseLog(
+					'  OpenAI rate limit exceeded. Waiting for ' + retryAfter + 'ms and retrying...'
+				)
+				await setTimeout(retryAfter)
+			} else {
+				throw error
+			}
+		}
+	}
 
 	cache[url] = response.choices[0].message.content
 
